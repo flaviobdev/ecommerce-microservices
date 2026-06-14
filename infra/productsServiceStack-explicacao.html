@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Explicação — productsServiceStack.ts</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      font-size: 14px;
+      line-height: 1.7;
+      color: #1a1a2e;
+      background: #fff;
+      padding: 40px 60px;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      font-size: 22px;
+      color: #0f3460;
+      border-bottom: 3px solid #e94560;
+      padding-bottom: 10px;
+      margin-bottom: 8px;
+    }
+
+    .subtitle {
+      font-size: 13px;
+      color: #666;
+      margin-bottom: 32px;
+    }
+
+    h2 {
+      font-size: 16px;
+      color: #0f3460;
+      margin-top: 32px;
+      margin-bottom: 10px;
+      background: #f0f4ff;
+      border-left: 4px solid #e94560;
+      padding: 6px 12px;
+      border-radius: 0 4px 4px 0;
+    }
+
+    p {
+      margin-bottom: 10px;
+    }
+
+    pre {
+      background: #1e1e2e;
+      color: #cdd6f4;
+      border-radius: 6px;
+      padding: 14px 16px;
+      font-family: 'Consolas', 'Courier New', monospace;
+      font-size: 12.5px;
+      overflow-x: auto;
+      margin: 10px 0 16px 0;
+      line-height: 1.6;
+    }
+
+    .comment { color: #6c7086; }
+    .keyword { color: #cba6f7; }
+    .string  { color: #a6e3a1; }
+    .prop    { color: #89dceb; }
+    .number  { color: #fab387; }
+    .type    { color: #f9e2af; }
+
+    .box {
+      border: 1px solid #d0d7de;
+      border-radius: 6px;
+      padding: 14px 18px;
+      margin: 14px 0;
+      background: #fafbfc;
+    }
+
+    .box.info    { border-left: 4px solid #0f3460; background: #f0f4ff; }
+    .box.warning { border-left: 4px solid #e94560; background: #fff0f3; }
+    .box.tip     { border-left: 4px solid #2ecc71; background: #f0fff4; }
+
+    .box strong { display: block; margin-bottom: 4px; font-size: 13px; color: #333; }
+
+    .diagram {
+      font-family: 'Consolas', monospace;
+      font-size: 13px;
+      background: #f6f8fa;
+      border: 1px solid #d0d7de;
+      border-radius: 6px;
+      padding: 16px 20px;
+      margin: 14px 0;
+      white-space: pre;
+      line-height: 1.8;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 12px 0;
+      font-size: 13px;
+    }
+
+    th {
+      background: #0f3460;
+      color: #fff;
+      padding: 8px 12px;
+      text-align: left;
+    }
+
+    td {
+      padding: 7px 12px;
+      border-bottom: 1px solid #e0e0e0;
+    }
+
+    tr:nth-child(even) td { background: #f6f8fa; }
+
+    .badge {
+      display: inline-block;
+      background: #e94560;
+      color: #fff;
+      border-radius: 12px;
+      padding: 1px 9px;
+      font-size: 11px;
+      font-weight: bold;
+      margin-right: 6px;
+      vertical-align: middle;
+    }
+
+    .page-break { page-break-before: always; }
+
+    footer {
+      margin-top: 48px;
+      font-size: 11px;
+      color: #999;
+      border-top: 1px solid #e0e0e0;
+      padding-top: 12px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>productsServiceStack.ts — Explicação Didática</h1>
+  <p class="subtitle">Arquivo: <code>lib/productsServiceStack.ts</code> &nbsp;|&nbsp; Projeto: EcommerceECSCDK &nbsp;|&nbsp; Data: 13/06/2026</p>
+
+  <!-- ───────────────────────── VISÃO GERAL ───────────────────────── -->
+  <h2>1. O que esse arquivo faz?</h2>
+  <p>
+    Esse arquivo cria a <strong>infraestrutura completa para rodar o serviço de produtos na AWS</strong>,
+    usando CDK (Cloud Development Kit). Em vez de clicar manualmente no console da AWS, você escreve
+    código TypeScript que monta tudo automaticamente.
+  </p>
+
+  <div class="box info">
+    <strong>Conceito: AWS CDK</strong>
+    CDK (Cloud Development Kit) é uma ferramenta da AWS que permite criar recursos na nuvem usando
+    código TypeScript/Python/Java etc. Você escreve a infraestrutura como código e o CDK converte
+    em CloudFormation (JSON/YAML) que a AWS executa.
+  </div>
+
+  <!-- ───────────────────────── IMPORTS ───────────────────────── -->
+  <h2>2. Os Imports</h2>
+  <p>Cada import é um "módulo" da AWS que você vai usar para criar recursos:</p>
+
+  <table>
+    <tr><th>Import</th><th>O que faz</th></tr>
+    <tr><td><code>ec2</code></td><td>Rede: VPC, Security Groups, regras de firewall</td></tr>
+    <tr><td><code>ecr</code></td><td>Repositório de imagens Docker (Elastic Container Registry)</td></tr>
+    <tr><td><code>ecs</code></td><td>Serviço que roda containers (Elastic Container Service)</td></tr>
+    <tr><td><code>logs</code></td><td>Logs da aplicação no CloudWatch</td></tr>
+    <tr><td><code>elbv2</code></td><td>Load Balancers (ALB e NLB) para distribuir tráfego</td></tr>
+  </table>
+
+  <!-- ───────────────────────── INTERFACE ───────────────────────── -->
+  <h2>3. A Interface de Props</h2>
+  <p>
+    Define o que essa Stack <strong>precisa receber</strong> de outras Stacks para funcionar.
+    É como a lista de ingredientes de uma receita:
+  </p>
+
+  <pre><span class="keyword">interface</span> <span class="type">ProductsServiceStackProps</span> <span class="keyword">extends</span> <span class="type">cdk.StackProps</span> {
+    vpc:        <span class="type">ec2.Vpc</span>;                           <span class="comment">// A rede onde tudo vai rodar</span>
+    cluster:    <span class="type">ecs.Cluster</span>;                      <span class="comment">// Agrupador dos containers ECS</span>
+    nlb:        <span class="type">elbv2.NetworkLoadBalancer</span>;        <span class="comment">// Balanceador de rede (TCP)</span>
+    alb:        <span class="type">elbv2.ApplicationLoadBalancer</span>;   <span class="comment">// Balanceador HTTP</span>
+    repository: <span class="type">ecr.Repository</span>;                  <span class="comment">// Imagem Docker da aplicação</span>
+}</pre>
+
+  <div class="box warning">
+    <strong>Por que receber da outra Stack e não criar aqui?</strong>
+    VPC, Cluster, ALB e NLB são recursos compartilhados por vários serviços. Por isso ficam em outra
+    Stack e são passados como parâmetro — evitando criar duplicatas e facilitando o reuso.
+  </div>
+
+  <!-- ───────────────────────── DIAGRAMA ───────────────────────── -->
+  <h2>4. Fluxo Geral da Infraestrutura</h2>
+
+  <div class="diagram">  Internet / API Gateway
+          ↓
+        NLB (TCP porta 8080)
+          ↓
+        ALB (HTTP porta 8080)
+          ↓
+    ECS Fargate Service
+    ┌──────────────────────────────────┐
+    │  Container 1 — ProductsService  │  ← imagem do ECR v1.0.0
+    │  Container 2 — ProductsService  │  ← logs no CloudWatch (7 dias)
+    └──────────────────────────────────┘</div>
+
+  <p class="page-break"></p>
+
+  <!-- ───────────────────────── TASK DEFINITION ───────────────────────── -->
+  <h2>5. TaskDefinition — "O molde do container"</h2>
+  <p>Define <strong>quanto recurso</strong> o container vai ter. No Fargate você não gerencia servidores — só informa CPU e memória.</p>
+
+  <pre><span class="keyword">const</span> taskDefinition = <span class="keyword">new</span> ecs.<span class="type">FargateTaskDefinition</span>(<span class="keyword">this</span>, <span class="string">"TaskDefinition"</span>, {
+    memoryLimitMiB: <span class="number">1024</span>,          <span class="comment">// 1 GB de RAM</span>
+    cpu: <span class="number">512</span>,                       <span class="comment">// meio vCPU</span>
+    family: <span class="string">"products-service"</span>,     <span class="comment">// nome identificador na AWS</span>
+})</pre>
+
+  <table>
+    <tr><th>Propriedade</th><th>Valor</th><th>O que significa</th></tr>
+    <tr><td>memoryLimitMiB</td><td>1024</td><td>1 GB de memória RAM para o container</td></tr>
+    <tr><td>cpu</td><td>512</td><td>0,5 vCPU (1024 = 1 vCPU inteiro)</td></tr>
+    <tr><td>family</td><td>products-service</td><td>Nome que agrupa versões da task na AWS</td></tr>
+  </table>
+
+  <!-- ───────────────────────── LOG DRIVER ───────────────────────── -->
+  <h2>6. LogDriver — "Para onde vão os logs"</h2>
+  <p>Configura onde os logs da aplicação vão aparecer no <strong>CloudWatch Logs</strong>.</p>
+
+  <pre><span class="keyword">const</span> logDriver = ecs.<span class="type">LogDrivers</span>.awsLogs({
+    streamPrefix: <span class="string">"ProductsService"</span>,
+    logGroup: <span class="keyword">new</span> logs.<span class="type">LogGroup</span>(<span class="keyword">this</span>, <span class="string">"LogGroup"</span>, {
+        logGroupName:    <span class="string">"ProductsService"</span>,
+        removalPolicy:   cdk.<span class="type">RemovalPolicy</span>.DESTROY,        <span class="comment">// apaga com a stack</span>
+        retention:       logs.<span class="type">RetentionDays</span>.ONE_WEEK,       <span class="comment">// mantém 7 dias</span>
+    })
+});</pre>
+
+  <div class="box tip">
+    <strong>Dica: RemovalPolicy.DESTROY</strong>
+    Quando você rodar <code>cdk destroy</code>, o grupo de logs e todos os logs dentro dele serão
+    deletados automaticamente. Útil para ambientes de estudo. Em produção, use
+    <code>RETAIN</code> para não perder histórico de logs acidentalmente.
+  </div>
+
+  <!-- ───────────────────────── ADD CONTAINER ───────────────────────── -->
+  <h2>7. addContainer — "O container em si"</h2>
+  <p>Conecta a imagem Docker (do ECR) à TaskDefinition e expõe a porta da aplicação:</p>
+
+  <pre>taskDefinition.<span class="prop">addContainer</span>(<span class="string">"ProductsService"</span>, {
+    image: ecs.<span class="type">ContainerImage</span>.fromEcrRepository(props.repository, <span class="string">"1.0.0"</span>),
+    containerName: <span class="string">"ProductsService"</span>,
+    logging: logDriver,
+    portMappings: [{
+        containerPort: <span class="number">8080</span>,
+        protocol:      ecs.<span class="type">Protocol</span>.TCP,
+    }]
+})</pre>
+
+  <p>
+    <span class="badge">Importante</span>
+    A versão <code>"1.0.0"</code> precisa existir no ECR. Sempre que quiser fazer deploy de uma nova versão,
+    mude essa tag aqui ou use uma estratégia de tag dinâmica (ex: <code>latest</code> ou a hash do commit).
+  </p>
+
+  <!-- ───────────────────────── FARGATE SERVICE ───────────────────────── -->
+  <h2>8. FargateService — "O serviço rodando"</h2>
+  <p>
+    Usa a TaskDefinition e mantém <strong>2 cópias</strong> do container rodando em paralelo
+    para alta disponibilidade:
+  </p>
+
+  <pre><span class="keyword">const</span> service = <span class="keyword">new</span> ecs.<span class="type">FargateService</span>(<span class="keyword">this</span>, <span class="string">"ProductsService"</span>, {
+    serviceName:    <span class="string">"ProductsService"</span>,
+    cluster:        props.cluster,
+    taskDefinition: taskDefinition,
+    desiredCount:   <span class="number">2</span>,             <span class="comment">// 2 instâncias em paralelo</span>
+})</pre>
+
+  <div class="box info">
+    <strong>Por que desiredCount: 2?</strong>
+    Se um container cair, o outro continua atendendo enquanto o ECS sobe um novo automaticamente.
+    Isso é chamado de <em>Alta Disponibilidade</em>.
+  </div>
+
+  <p class="page-break"></p>
+
+  <!-- ───────────────────────── PERMISSÃO + SG ───────────────────────── -->
+  <h2>9. Permissão + Security Group</h2>
+
+  <pre>props.repository.<span class="prop">grantPull</span>(taskDefinition.taskRole);
+
+service.connections.securityGroups[<span class="number">0</span>]
+    .addIngressRule(ec2.<span class="type">Peer</span>.ipv4(props.vpc.vpcCidrBlock), ec2.<span class="type">Port</span>.tcp(<span class="number">8080</span>))</pre>
+
+  <table>
+    <tr><th>Linha</th><th>O que faz</th></tr>
+    <tr><td>grantPull</td><td>Dá permissão IAM ao container de baixar a imagem do ECR</td></tr>
+    <tr><td>addIngressRule</td><td>Abre a porta 8080 <strong>apenas para IPs dentro da VPC</strong> (segurança)</td></tr>
+  </table>
+
+  <div class="box warning">
+    <strong>Segurança importante</strong>
+    A regra <code>ipv4(props.vpc.vpcCidrBlock)</code> significa que só recursos dentro da mesma VPC
+    podem acessar o container diretamente. O tráfego externo só chega via Load Balancer.
+  </div>
+
+  <!-- ───────────────────────── ALB ───────────────────────── -->
+  <h2>10. ALB — Application Load Balancer</h2>
+  <p>
+    O ALB distribui requisições HTTP entre as instâncias do container.
+    Funciona na camada 7 (entende HTTP, headers, cookies etc).
+  </p>
+
+  <pre><span class="comment">// 1. Criar o listener (ponto de entrada)</span>
+<span class="keyword">const</span> albListener = props.alb.<span class="prop">addListener</span>(<span class="string">"ProductsServiceAlbListener"</span>, {
+    port:     <span class="number">8080</span>,
+    protocol: elbv2.<span class="type">ApplicationProtocol</span>.HTTP,
+    open:     <span class="keyword">true</span>,
+})
+
+<span class="comment">// 2. Registrar os containers como alvos + configurar health check</span>
+albListener.<span class="prop">addTargets</span>(<span class="string">"ProductsServiceAlbTarget"</span>, {
+    targetGroupName:     <span class="string">"productsServiceAlb"</span>,
+    port:                <span class="number">8080</span>,
+    targets:             [service],
+    protocol:            elbv2.<span class="type">ApplicationProtocol</span>.HTTP,
+    deregistrationDelay: cdk.<span class="type">Duration</span>.seconds(<span class="number">30</span>),
+    healthCheck: {
+        interval:         cdk.<span class="type">Duration</span>.seconds(<span class="number">30</span>),
+        enabled:          <span class="keyword">true</span>,
+        port:             <span class="string">"8080"</span>,
+        timeout:          cdk.<span class="type">Duration</span>.seconds(<span class="number">10</span>),
+        path:             <span class="string">"/health"</span>,
+        healthyHttpCodes: <span class="string">"200"</span>,
+    }
+})</pre>
+
+  <table>
+    <tr><th>Configuração</th><th>Valor</th><th>O que faz</th></tr>
+    <tr><td>path</td><td>/health</td><td>Endpoint que o ALB bate para checar se o container está vivo</td></tr>
+    <tr><td>interval</td><td>30s</td><td>Frequência das verificações de saúde</td></tr>
+    <tr><td>timeout</td><td>10s</td><td>Tempo máximo de espera por resposta</td></tr>
+    <tr><td>healthyHttpCodes</td><td>200</td><td>Só considera saudável se retornar HTTP 200</td></tr>
+    <tr><td>deregistrationDelay</td><td>30s</td><td>Aguarda conexões ativas finalizarem antes de remover instância</td></tr>
+  </table>
+
+  <!-- ───────────────────────── NLB ───────────────────────── -->
+  <h2>11. NLB — Network Load Balancer</h2>
+  <p>
+    O NLB opera na camada 4 (TCP). É usado quando outros serviços AWS (como API Gateway com
+    VPC Link) precisam acessar o ALB de forma privada:
+  </p>
+
+  <pre><span class="keyword">const</span> nlbListener = props.nlb.<span class="prop">addListener</span>(<span class="string">"ProductsServiceNlbListener"</span>, {
+    port:     <span class="number">8080</span>,
+    protocol: elbv2.<span class="type">Protocol</span>.TCP,
+})
+
+nlbListener.<span class="prop">addTargets</span>(<span class="string">"ProductsServiceNlbTarget"</span>, {
+    port:            <span class="number">8080</span>,
+    targetGroupName: <span class="string">"productsServiceNlb"</span>,
+    protocol:        elbv2.<span class="type">Protocol</span>.TCP,
+    targets: [
+        service.<span class="prop">loadBalancerTarget</span>({
+            containerName: <span class="string">"ProductsService"</span>,
+            containerPort: <span class="number">8080</span>,
+            protocol:      ecs.<span class="type">Protocol</span>.TCP,
+        })
+    ],
+})</pre>
+
+  <div class="box info">
+    <strong>ALB vs NLB — Qual a diferença?</strong><br/>
+    <strong>ALB</strong> entende HTTP, aplica regras de roteamento por path/header, ideal para
+    microsserviços web.<br/>
+    <strong>NLB</strong> é mais rápido e simples, trabalha só com TCP/UDP — usado como ponto de entrada
+    para o API Gateway (VPC Link) que não consegue falar diretamente com ALBs privados.
+  </div>
+
+  <!-- ───────────────────────── RESUMO ───────────────────────── -->
+  <h2>12. Resumo: Ordem de Criação</h2>
+
+  <table>
+    <tr><th>#</th><th>Recurso</th><th>Para que serve</th></tr>
+    <tr><td>1</td><td>FargateTaskDefinition</td><td>Define CPU, memória e família da task</td></tr>
+    <tr><td>2</td><td>LogGroup + LogDriver</td><td>Envia logs ao CloudWatch por 7 dias</td></tr>
+    <tr><td>3</td><td>addContainer</td><td>Associa imagem Docker e expõe porta 8080</td></tr>
+    <tr><td>4</td><td>FargateService</td><td>Roda 2 instâncias do container no cluster</td></tr>
+    <tr><td>5</td><td>grantPull + addIngressRule</td><td>Permissão ECR + regra de firewall interna</td></tr>
+    <tr><td>6</td><td>ALB Listener + Target Group</td><td>Recebe HTTP e distribui com health check</td></tr>
+    <tr><td>7</td><td>NLB Listener + Target Group</td><td>Ponto de entrada TCP para API Gateway</td></tr>
+  </table>
+
+  <div class="box tip">
+    <strong>Como recriar esse arquivo do zero</strong>
+    <ol style="margin-top:6px; padding-left: 20px; line-height: 2">
+      <li>Crie a classe estendendo <code>cdk.Stack</code></li>
+      <li>Defina a interface de props com os recursos compartilhados (vpc, cluster, alb, nlb, repository)</li>
+      <li>Crie a <code>FargateTaskDefinition</code> com CPU e memória</li>
+      <li>Configure o <code>LogDriver</code> apontando para um <code>LogGroup</code></li>
+      <li>Adicione o container com <code>addContainer</code> (imagem, porta, logs)</li>
+      <li>Crie o <code>FargateService</code> com <code>desiredCount: 2</code></li>
+      <li>Dê permissão de pull no ECR e abra a porta no Security Group</li>
+      <li>Configure o ALB listener e o target group com health check em <code>/health</code></li>
+      <li>Configure o NLB listener e target group apontando para o container via <code>loadBalancerTarget</code></li>
+    </ol>
+  </div>
+
+  <footer>
+    Documentação gerada automaticamente &nbsp;|&nbsp; EcommerceECSCDK &nbsp;|&nbsp; 13/06/2026
+  </footer>
+
+</body>
+</html>
