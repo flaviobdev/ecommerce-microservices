@@ -45,7 +45,8 @@ export class ProductsController {
             name: product.productName,
             code: product.code,
             price: product.price,
-            model: product.model
+            model: product.model,
+            url: product.productUrl
         }
     }
 
@@ -55,7 +56,8 @@ export class ProductsController {
             productName: productDto.name,
             code: productDto.code,
             price: productDto.price,
-            model: productDto.model
+            model: productDto.model,
+            productUrl: productDto.url
         }
     }
 }

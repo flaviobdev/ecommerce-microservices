@@ -73,12 +73,13 @@ export class ProductsService {
             const command = new UpdateCommand({
                 TableName: this.tableName,
                 Key: key,
-                UpdateExpression: "set productName = :productName, code = :code, price = :price, model = :model",
+                UpdateExpression: "set productName = :productName, code = :code, price = :price, model = :model, productUrl = :productUrl",
                 ExpressionAttributeValues: {
                     ":productName": product.productName,
                     ":code": product.code,
                     ":price": product.price,
-                    ":model": product.model
+                    ":model": product.model,
+                    ":productUrl": product.productUrl
                 },
                 ReturnValues: "UPDATED_NEW",
                 ConditionExpression: 'attribute_exists(id)' // isso garante que o produto exista antes de tentar atualizar, caso contrário lança um erro

@@ -52,7 +52,7 @@ export class ProductsServiceStack extends cdk.Stack {
         });
 
         taskDefinition.addContainer('ProductsServiceContainer', {
-            image: ecs.ContainerImage.fromEcrRepository(props.repository, '1.0.5'),
+            image: ecs.ContainerImage.fromEcrRepository(props.repository, '1.0.7'),
             containerName: 'productsService',
             logging: logDriver,
             portMappings: [{

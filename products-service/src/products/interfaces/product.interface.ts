@@ -7,4 +7,5 @@ export interface Product extends ProductKey {
     code: string;
     price: number;
     model: string;
+    productUrl: string;
 }

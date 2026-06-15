@@ -4,4 +4,5 @@ export class ProductDto {
     code!: string;
     price!: number;
     model!: string;
+    url!: string;
 }
