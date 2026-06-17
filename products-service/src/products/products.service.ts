@@ -3,6 +3,7 @@ import { DeleteCommand, DynamoDBDocumentClient, GetCommand, PutCommand, ScanComm
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { Product, ProductKey } from './interfaces/product.interface';
 import { v4 as uuid } from 'uuid';
+import {  captureAWSv3Client } from 'aws-xray-sdk';
 
 @Injectable()
 export class ProductsService {
@@ -11,7 +12,8 @@ export class ProductsService {
 
     constructor() {
         this.tableName = process.env.PRODUCTS_DDB!
-        this.ddbDocClient = DynamoDBDocumentClient.from(new DynamoDBClient({}))
+        const ddbClient = captureAWSv3Client(new DynamoDBClient({})) // o captureAWSv3Client é necessário para que as chamadas ao DynamoDB sejam capturadas pelo X-Ray
+        this.ddbDocClient = DynamoDBDocumentClient.from(ddbClient)
     }
 
     async findAll(): Promise<Product[]> {

@@ -5,6 +5,7 @@ import * as ecs from 'aws-cdk-lib/aws-ecs';
 import * as logs from 'aws-cdk-lib/aws-logs';
 import * as elbv2 from 'aws-cdk-lib/aws-elasticloadbalancingv2';
 import * as dynamodb from 'aws-cdk-lib/aws-dynamodb';
+import * as iam from 'aws-cdk-lib/aws-iam';
 import { Construct } from 'constructs';
 
 interface ProductsServiceStackProps extends cdk.StackProps {
@@ -41,6 +42,7 @@ export class ProductsServiceStack extends cdk.Stack {
             family: 'products-service',
         });
         productsDdb.grantReadWriteData(taskDefinition.taskRole); // Permite que a task acesse a tabela DynamoDB
+        taskDefinition.taskRole.addManagedPolicy(iam.ManagedPolicy.fromAwsManagedPolicyName('AWSXrayWriteOnlyAccess')); // Permite que a task envie dados para o X-Ray
 
         const logDriver = new ecs.AwsLogDriver({
             logGroup: new logs.LogGroup(this, 'LogGroup', {
@@ -52,17 +54,42 @@ export class ProductsServiceStack extends cdk.Stack {
         });
 
         taskDefinition.addContainer('ProductsServiceContainer', {
-            image: ecs.ContainerImage.fromEcrRepository(props.repository, '1.0.7'),
+            image: ecs.ContainerImage.fromEcrRepository(props.repository, '1.1.0'),
             containerName: 'productsService',
             logging: logDriver,
             portMappings: [{
                 containerPort: 8080,
                 protocol: ecs.Protocol.TCP,
             }],
+            cpu: 384,
+            memoryLimitMiB: 896,
             environment: {
                 PRODUCTS_DDB: productsDdb.tableName,
+                AWS_XRAY_TRACING_NAME: 'products-service',
+                AWS_XRAY_DAEMON_ADDRESS: '0.0.0.0:2000', // Configura o endereço do X-Ray Daemon para que as chamadas sejam capturadas
+                AWS_XRAY_CONTEXT_MISSING: 'IGNORE_ERROR', // Configura o comportamento quando o contexto do X-Ray estiver ausente (opcional, dependendo do seu caso de uso)
+                LOGGER_LEVEL: 'INFO', // Configura o nível de log para a aplicação, se necessário
             }
         });
+
+        taskDefinition.addContainer('xray', {
+            image: ecs.ContainerImage.fromRegistry('public.ecr.aws/xray/aws-xray-daemon:latest'),
+            containerName: 'XrayProductsService',
+            logging: ecs.LogDrivers.awsLogs({
+                logGroup: new logs.LogGroup(this, 'XrayLogGroup', {
+                    logGroupName: 'XrayProductsService',
+                    removalPolicy: cdk.RemovalPolicy.DESTROY,
+                    retention: logs.RetentionDays.ONE_WEEK
+                }),
+                streamPrefix: 'XrayProductsService',
+            }),
+            cpu: 128,
+            memoryLimitMiB: 128,
+            portMappings: [{
+                containerPort: 2000,
+                protocol: ecs.Protocol.UDP,
+            }],
+        })
 
         const service = new ecs.FargateService(this, 'ProductsService', {
             serviceName: 'ProductsService',

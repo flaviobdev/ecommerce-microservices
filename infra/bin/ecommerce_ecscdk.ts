@@ -4,7 +4,7 @@ import { EcrStack } from '../lib/ecr-stack';
 import { VpcStack } from '../lib/vpc-stack';
 import { ClusterStack } from '../lib/cluster-stack';
 import { LoadBalancerStack } from '../lib/lb-stack';
-import { ProductsServiceStack } from '../lib/productsServiceStack';
+import { ProductsServiceStack } from '../lib/productsService-stack';
 import { ApiStack } from '../lib/api-stack';
 
 const app = new cdk.App();
