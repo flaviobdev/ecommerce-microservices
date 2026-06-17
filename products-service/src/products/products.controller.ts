@@ -1,11 +1,13 @@
-import { Body, Controller, Delete, Get, Headers, Param, Post, Put } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Headers, Param, Post, Put, UseFilters } from '@nestjs/common';
 import { Product } from './interfaces/product.interface';
 import { ProductDto } from './dto/product.dto';
 import { ProductsService } from './products.service';
 import { JsonLogger, LoggerFactory } from 'json-logger-service';
+import { ProductExceptionFilter } from './exceptions/product.exceptionFilter';
 
 
 @Controller('api/products')
+@UseFilters(ProductExceptionFilter)
 export class ProductsController {
     private readonly logger: JsonLogger = LoggerFactory.createLogger(ProductsController.name);
 

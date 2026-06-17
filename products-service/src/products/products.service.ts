@@ -1,11 +1,14 @@
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 import { DeleteCommand, DynamoDBDocumentClient, GetCommand, PutCommand, ScanCommand, UpdateCommand } from '@aws-sdk/lib-dynamodb';
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, UseFilters } from '@nestjs/common';
 import { Product, ProductKey } from './interfaces/product.interface';
 import { v4 as uuid } from 'uuid';
 import {  captureAWSv3Client } from 'aws-xray-sdk';
+import { ProductExceptionFilter } from './exceptions/product.exceptionFilter';
+import { ProductException } from './exceptions/product.exception';
 
 @Injectable()
+
 export class ProductsService {
     private tableName: string
     private ddbDocClient: DynamoDBDocumentClient
@@ -36,7 +39,7 @@ export class ProductsService {
         if (data.Item) {
             return data.Item as Product
         } else {
-            throw new HttpException("Product not found", HttpStatus.NOT_FOUND)
+            throw new ProductException("Product not found", HttpStatus.NOT_FOUND, key.id)
         }
 
     }
@@ -65,7 +68,7 @@ export class ProductsService {
         if (data.Attributes) {
             return data.Attributes as Product
         } else {
-            throw new HttpException("Product not found", HttpStatus.NOT_FOUND)
+            throw new ProductException("Product not found", HttpStatus.NOT_FOUND, key.id)
         }
 
     }
@@ -92,7 +95,7 @@ export class ProductsService {
             data.Attributes!.id = key.id! // o id não é atualizado, mas queremos retornar ele junto com os outros atributos
             return data.Attributes as Product
         } catch (ConditionCheckFailedException) {
-            throw new HttpException("Product not found", HttpStatus.NOT_FOUND)
+            throw new ProductException("Product not found", HttpStatus.NOT_FOUND, key.id)
         }
     }
 }
